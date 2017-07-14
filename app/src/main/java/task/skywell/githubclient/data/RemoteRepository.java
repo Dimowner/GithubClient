@@ -18,7 +18,10 @@ package task.skywell.githubclient.data;
 
 import android.support.annotation.NonNull;
 
-import io.reactivex.Single;
+import java.util.ArrayList;
+import java.util.List;
+
+import io.reactivex.Flowable;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -26,7 +29,9 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import task.skywell.githubclient.data.model.GitHubRepository;
 import task.skywell.githubclient.data.model.SearchResult;
+import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 /**
  * Created on 14.07.2017.
@@ -36,16 +41,18 @@ public class RemoteRepository implements IRepository {
 
 	private static final String API_URL = "https://api.github.com";
 
+	private OnLoadListener onLoadListener;
+
 	interface GitHub {
 		@GET("/search/repositories")
-		Single<SearchResult> searchRepositories(
+		Flowable<SearchResult> searchRepositories(
 				@Query("q") String search,
 				@Query("sort") String order,
 				@Query("page") Integer page);
 	}
 
 	@Override
-	public Single<SearchResult> searchRepositories(@NonNull String search) {
+	public Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
 
 		HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
 		interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -62,9 +69,32 @@ public class RemoteRepository implements IRepository {
 		// Create an instance of our GitHub API interface.
 		GitHub github = retrofit.create(GitHub.class);
 
-//		TODO: save into local repository
 //		TODO: do two parallel queries
-		return github.searchRepositories(search, "stars", 0);
+		return github.searchRepositories(search, "stars", 0)
+				.map(this::convertModel)
+				.doOnNext(data -> {
+						if (onLoadListener != null) {
+							onLoadListener.onRepositoriesLoad(search, data);
+						}
+					});
+	}
+
+	/**
+	 * Convert {@link task.skywell.githubclient.data.model.GitHubRepository} models int {@link RepositoryItemModel} models
+	 * @param data {@link task.skywell.githubclient.data.model.GitHubRepository} list
+	 * @return {@link RepositoryItemModel} list
+	 */
+	private List<RepositoryItemModel> convertModel(SearchResult data) {
+		List<RepositoryItemModel> listData = new ArrayList<>();
+
+		GitHubRepository[] items = data.getItems();
+
+		for (GitHubRepository e : items) {
+			RepositoryItemModel item = new RepositoryItemModel(e.getId(), e.getName(),
+							e.getOwner().getLogin(), e.getDescription(), e.getOwner().getAvatar_url());
+			listData.add(item);
+		}
+		return listData;
 	}
 //
 //	private SearchResult convert(SearchResult r1, SearchResult r2) {
@@ -83,4 +113,12 @@ public class RemoteRepository implements IRepository {
 //		}
 //		return new SearchResult(totalCount, items);
 //	}
+
+	public void setOnLoadListener(OnLoadListener onLoadListener) {
+		this.onLoadListener = onLoadListener;
+	}
+
+	public interface OnLoadListener {
+		void onRepositoriesLoad(String query, List<RepositoryItemModel> list);
+	}
 }

@@ -14,30 +14,27 @@
  * limitations under the License.
  */
 
-package task.skywell.githubclient.data.provider;
+package task.skywell.githubclient.data.room;
 
-import android.content.Context;
-import task.skywell.githubclient.data.LocalRepository;
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
+import java.util.List;
+import io.reactivex.Flowable;
 
 /**
  * Created on 14.07.2017.
  * @author Dimowner
  */
-public class LocalRepositoryProvider {
+@Dao
+public interface RepositoriesDao {
+	@Query("SELECT * FROM RepositoryItemModel")
+	Flowable<List<RepositoryItemModel>> getAll();
 
-	//Prevent instantiation
-	private LocalRepositoryProvider() {}
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	void insertAll(RepositoryItemModel... items);
 
-	private static volatile LocalRepository localRepository;
-
-	public static LocalRepository getInstance(Context context) {
-		synchronized (LocalRepositoryProvider.class) {
-			if (localRepository == null) {
-				localRepository = new LocalRepository(context);
-			} else if (!localRepository.isContextLive()) {
-				localRepository.setContext(context);
-			}
-			return localRepository;
-		}
-	}
+	@Query("DELETE FROM RepositoryItemModel")
+	void deleteAll();
 }

@@ -16,20 +16,94 @@
 
 package task.skywell.githubclient.data;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
+
+import io.reactivex.Flowable;
 import io.reactivex.Single;
-import task.skywell.githubclient.data.model.SearchResult;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import task.skywell.githubclient.data.room.AppDatabase;
+import task.skywell.githubclient.data.room.RepositoriesDao;
+import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 /**
  * Created on 14.07.2017.
- *
  * @author Dimowner
  */
 public class LocalRepository implements IRepository {
 
+	private static final String PREF_KEY_QUERY = "pref_key_query";
+
+	private WeakReference<Context> weakContext;
+
+	public LocalRepository(Context context) {
+		this.weakContext = new WeakReference<>(context);
+	}
+
+	/**
+	 * Check weak reference to {@link Context} still live.
+	 * @return true if live, otherwise - false
+	 */
+	public boolean isContextLive() {
+		return weakContext.get() != null;
+	}
+
+	public void setContext(Context weakContext) {
+		this.weakContext = new WeakReference<>(weakContext);
+	}
+
 	@Override
-	public Single<SearchResult> searchRepositories(@NonNull String search) {
-		return null;
+	public Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
+		return getRepositoriesDao().getAll()
+				.subscribeOn(Schedulers.io())
+				.subscribeOn(AndroidSchedulers.mainThread());
+	}
+
+	/**
+	 * Rewrite local cached repositories
+	 * @param items new repositories to save.
+	 */
+	public void rewriteRepositories(List<RepositoryItemModel> items) {
+		Single.just(items).map(data -> {
+			getRepositoriesDao().deleteAll();
+			getRepositoriesDao().insertAll(data.toArray(new RepositoryItemModel[data.size()]));
+			return null;
+		}).subscribeOn(Schedulers.io()).subscribe();
+	}
+
+	private RepositoriesDao getRepositoriesDao() {
+		return AppDatabase.getInstance(weakContext.get()).repositoriesDao();
+	}
+
+	/**
+	 * Save into preferences query string.
+	 * @param str query string
+	 */
+	public void saveQueryString(String str) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(weakContext.get());
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putString(PREF_KEY_QUERY, str);
+		editor.apply();
+	}
+
+	/**
+	 * Check query string already cached
+	 * @param queryStr string to check
+	 */
+	boolean isCached(String queryStr) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(weakContext.get());
+		String saveStr = prefs.getString(PREF_KEY_QUERY, "");
+		if (saveStr.isEmpty()) {
+			return false;
+		} else if (saveStr.toLowerCase().equals(queryStr.toLowerCase())) {
+			return true;
+		}
+		return false;
 	}
 }

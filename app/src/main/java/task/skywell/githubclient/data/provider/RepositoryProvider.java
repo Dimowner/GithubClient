@@ -16,6 +16,9 @@
 
 package task.skywell.githubclient.data.provider;
 
+import android.content.Context;
+import task.skywell.githubclient.data.LocalRepository;
+import task.skywell.githubclient.data.RemoteRepository;
 import task.skywell.githubclient.data.Repository;
 
 /**
@@ -29,13 +32,16 @@ public class RepositoryProvider {
 
 	private static volatile Repository repository;
 
-	public static Repository getInstance() {
+	public static Repository getInstance(Context context) {
 		synchronized (RepositoryProvider.class) {
 			if (repository == null) {
-				repository = new Repository(
-						LocalRepositoryProvider.getInstance(),
-						RemoteRepositoryProvider.getInstance()
-				);
+				LocalRepository local = LocalRepositoryProvider.getInstance(context);
+				RemoteRepository remote = RemoteRepositoryProvider.getInstance();
+				remote.setOnLoadListener((query, data) -> {
+					local.rewriteRepositories(data);
+					local.saveQueryString(query);
+				});
+				repository = new Repository(local, remote);
 			}
 			return repository;
 		}

@@ -17,10 +17,9 @@
 package task.skywell.githubclient.data;
 
 import android.support.annotation.NonNull;
-
-import io.reactivex.Single;
-import task.skywell.githubclient.data.model.SearchResult;
-import timber.log.Timber;
+import java.util.List;
+import io.reactivex.Flowable;
+import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 /**
  * Created on 14.07.2017.
@@ -37,17 +36,11 @@ public class Repository implements IRepository {
 	}
 
 	@Override
-	public Single<SearchResult> searchRepositories(@NonNull String search) {
-		Timber.v("searchRepository str = " + search);
-		if (isCached(search)) {
+	public Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
+		if (localRepository.isCached(search)) {
 			return localRepository.searchRepositories(search);
 		} else {
 			return remoteRepository.searchRepositories(search);
 		}
-	}
-
-	//TODO: implement this method
-	private boolean isCached(String str) {
-		return false;
 	}
 }

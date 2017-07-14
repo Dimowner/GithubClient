@@ -25,16 +25,23 @@ import android.support.annotation.NonNull;
  * @author Dimowner
  */
 class ListItem implements Parcelable {
-	private String name;
-	private String owner;
-	private String description;
-	private String avatar_url;
 
-	ListItem(@NonNull String name, @NonNull String owner, String description, String avatar_url) {
+	private final long id;
+	private final String name;
+	private final String owner;
+	private final String description;
+	private final String avatar_url;
+
+	ListItem(@NonNull long id, @NonNull String name, @NonNull String owner, String description, String avatar_url) {
+		this.id = id;
 		this.name = name;
 		this.owner = owner;
 		this.description = description;
 		this.avatar_url = avatar_url;
+	}
+
+	public long getId() {
+		return id;
 	}
 
 	String getName() {
@@ -55,6 +62,7 @@ class ListItem implements Parcelable {
 
 	//----- START Parcelable implementation ----------
 	private ListItem(Parcel in) {
+		id = in.readLong();
 		String[] data = new String[4];
 		in.readStringArray(data);
 		name = data[0];
@@ -68,7 +76,8 @@ class ListItem implements Parcelable {
 	}
 
 	public void writeToParcel(Parcel out, int flags) {
-			out.writeStringArray(new String[] {name, owner, description, avatar_url});
+		out.writeLong(id);
+		out.writeStringArray(new String[] {name, owner, description, avatar_url});
 	}
 
 	public static final Parcelable.Creator<ListItem> CREATOR
@@ -86,7 +95,8 @@ class ListItem implements Parcelable {
 	@Override
 	public String toString() {
 		return "ListItem{" +
-				"name='" + name + '\'' +
+				"id=" + id +
+				", name='" + name + '\'' +
 				", owner='" + owner + '\'' +
 				", description='" + description + '\'' +
 				", avatar_url='" + avatar_url + '\'' +

@@ -18,8 +18,10 @@ package task.skywell.githubclient.data;
 
 import android.support.annotation.NonNull;
 
-import io.reactivex.Single;
-import task.skywell.githubclient.data.model.SearchResult;
+import java.util.List;
+
+import io.reactivex.Flowable;
+import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 /**
  * Created on 14.07.2017.
@@ -27,6 +29,6 @@ import task.skywell.githubclient.data.model.SearchResult;
  */
 interface IRepository {
 
-	Single<SearchResult> searchRepositories(@NonNull String search);
+	Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search);
 
 }

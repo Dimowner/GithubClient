@@ -43,9 +43,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import task.skywell.githubclient.R;
-import task.skywell.githubclient.data.model.GitHubRepository;
-import task.skywell.githubclient.data.model.SearchResult;
 import task.skywell.githubclient.data.provider.RepositoryProvider;
+import task.skywell.githubclient.data.room.RepositoryItemModel;
 import task.skywell.githubclient.widget.SearchViewPanel;
 import timber.log.Timber;
 
@@ -90,7 +89,6 @@ public class RepositoriesFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		constraintLayout = (ConstraintLayout) view.findViewById(R.id.coordinator_layout);
 
-		Timber.v("hasInternet = " + isConnectedToNetwork(getContext()));
 		mSearchPanel = (SearchViewPanel) view.findViewById(R.id.search_panel);
 		mSearchPanel.setHint(getString(R.string.repository_name));
 		mSearchPanel.setOnSearchListener(new SearchViewPanel.OnSearchListener() {
@@ -150,7 +148,7 @@ public class RepositoriesFragment extends Fragment {
 	private void searchRepositories(String str) {
 		if (str != null) {
 			compositeDisposable.add(
-					RepositoryProvider.getInstance()
+					RepositoryProvider.getInstance(getContext())
 							.searchRepositories(str)
 							.map(this::convertModel)
 							.subscribeOn(Schedulers.io())
@@ -164,13 +162,10 @@ public class RepositoriesFragment extends Fragment {
 	 * @param data {@link task.skywell.githubclient.data.model.GitHubRepository} list
 	 * @return {@link ListItem} list
 	 */
-	private List<ListItem> convertModel(SearchResult data) {
-		List<ListItem> listData = new ArrayList<>();
-
-		GitHubRepository[] items = data.getItems();
-
-		for (GitHubRepository e : items) {
-			ListItem item = new ListItem(e.getName(), e.getOwner().getLogin(), e.getDescription(), e.getOwner().getAvatar_url());
+	private List<ListItem> convertModel(List<RepositoryItemModel> data) {
+		List<ListItem> listData = new ArrayList<>(data.size());
+		for (RepositoryItemModel e : data) {
+			ListItem item = new ListItem(e.getId(), e.getName(), e.getOwner(), e.getDescription(), e.getAvatar_url());
 			listData.add(item);
 		}
 		return listData;
