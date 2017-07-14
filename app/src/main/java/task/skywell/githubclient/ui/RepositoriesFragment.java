@@ -41,9 +41,8 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import task.skywell.githubclient.R;
-import task.skywell.githubclient.data.provider.RepositoryProvider;
+import task.skywell.githubclient.data.injection.RepositoryProvider;
 import task.skywell.githubclient.data.room.RepositoryItemModel;
 import task.skywell.githubclient.widget.SearchViewPanel;
 import timber.log.Timber;
@@ -150,9 +149,8 @@ public class RepositoriesFragment extends Fragment {
 			compositeDisposable.add(
 					RepositoryProvider.getInstance(getContext())
 							.searchRepositories(str)
-							.map(this::convertModel)
-							.subscribeOn(Schedulers.io())
 							.observeOn(AndroidSchedulers.mainThread())
+							.map(this::convertModel)
 							.subscribe(this::displayData, this::handleError));
 		}
 	}

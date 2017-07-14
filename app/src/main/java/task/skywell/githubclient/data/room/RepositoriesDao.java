@@ -18,7 +18,6 @@ package task.skywell.githubclient.data.room;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import java.util.List;
 import io.reactivex.Flowable;
@@ -32,7 +31,7 @@ public interface RepositoriesDao {
 	@Query("SELECT * FROM RepositoryItemModel")
 	Flowable<List<RepositoryItemModel>> getAll();
 
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	@Insert
 	void insertAll(RepositoryItemModel... items);
 
 	@Query("DELETE FROM RepositoryItemModel")

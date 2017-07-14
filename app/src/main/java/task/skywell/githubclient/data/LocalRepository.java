@@ -31,6 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 import task.skywell.githubclient.data.room.AppDatabase;
 import task.skywell.githubclient.data.room.RepositoriesDao;
 import task.skywell.githubclient.data.room.RepositoryItemModel;
+import timber.log.Timber;
 
 /**
  * Created on 14.07.2017.
@@ -74,7 +75,7 @@ public class LocalRepository implements IRepository {
 			getRepositoriesDao().deleteAll();
 			getRepositoriesDao().insertAll(data.toArray(new RepositoryItemModel[data.size()]));
 			return null;
-		}).subscribeOn(Schedulers.io()).subscribe();
+		}).subscribeOn(Schedulers.io()).subscribe((o, throwable) -> Timber.e(throwable));
 	}
 
 	private RepositoriesDao getRepositoriesDao() {

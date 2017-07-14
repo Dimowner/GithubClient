@@ -14,30 +14,27 @@
  * limitations under the License.
  */
 
-package task.skywell.githubclient.data.provider;
+package task.skywell.githubclient.data.injection;
 
-import android.content.Context;
-import task.skywell.githubclient.data.LocalRepository;
+import task.skywell.githubclient.data.RemoteRepository;
 
 /**
  * Created on 14.07.2017.
  * @author Dimowner
  */
-public class LocalRepositoryProvider {
+public class RemoteRepositoryProvider {
 
 	//Prevent instantiation
-	private LocalRepositoryProvider() {}
+	private RemoteRepositoryProvider() {}
 
-	private static volatile LocalRepository localRepository;
+	private static volatile RemoteRepository remoteRepository;
 
-	public static LocalRepository getInstance(Context context) {
-		synchronized (LocalRepositoryProvider.class) {
-			if (localRepository == null) {
-				localRepository = new LocalRepository(context);
-			} else if (!localRepository.isContextLive()) {
-				localRepository.setContext(context);
+	public static RemoteRepository getInstance() {
+		synchronized (RemoteRepository.class) {
+			if (remoteRepository == null) {
+				remoteRepository = new RemoteRepository();
 			}
-			return localRepository;
+			return remoteRepository;
 		}
 	}
 }

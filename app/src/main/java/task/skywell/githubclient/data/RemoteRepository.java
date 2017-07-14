@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -69,14 +70,19 @@ public class RemoteRepository implements IRepository {
 		// Create an instance of our GitHub API interface.
 		GitHub github = retrofit.create(GitHub.class);
 
-//		TODO: do two parallel queries
-		return github.searchRepositories(search, "stars", 0)
-				.map(this::convertModel)
+		return Flowable.zip(
+				github.searchRepositories(search, "stars", 0)
+						.map(this::convertModel)
+						.subscribeOn(Schedulers.io()),
+				github.searchRepositories(search, "stars", 1)
+						.map(this::convertModel)
+						.subscribeOn(Schedulers.io()),
+				this::convert)
 				.doOnNext(data -> {
-						if (onLoadListener != null) {
-							onLoadListener.onRepositoriesLoad(search, data);
-						}
-					});
+							if (onLoadListener != null) {
+								onLoadListener.onRepositoriesLoad(search, data);
+							}
+						});
 	}
 
 	/**
@@ -96,23 +102,19 @@ public class RemoteRepository implements IRepository {
 		}
 		return listData;
 	}
-//
-//	private SearchResult convert(SearchResult r1, SearchResult r2) {
-//		int totalCount = r1.getTotalCount() + r2.getTotalCount();
-//
-//		GitHubRepository[] array1 = r1.getItems();
-//		GitHubRepository[] array2 = r2.getItems();
-//		GitHubRepository[] items = new GitHubRepository[totalCount];
-//		Timber.v("a1 = " + array1.length + " a2 = " + array2.length);
-//		for (int i = 0; i < array1.length; i++) {
-//			items[i] = array1[i];
-//		}
-//		int lastIndex = array1.length-1;
-//		for (int i = 0; i < array2.length; i++) {
-//			items[lastIndex + i] = array2[i];
-//		}
-//		return new SearchResult(totalCount, items);
-//	}
+
+	private List<RepositoryItemModel> convert(List<RepositoryItemModel> r1, List<RepositoryItemModel> r2) {
+		List<RepositoryItemModel> list = new ArrayList<>(r1.size() + r2.size());
+		list.addAll(r1);
+		list.addAll(r2);
+
+		//Update all items id to avoid SQLiteConstraintException on insert into SQLite
+		for (int i = 0; i < list.size(); i++) {
+			list.get(i).setId(i);
+		}
+
+		return list;
+	}
 
 	public void setOnLoadListener(OnLoadListener onLoadListener) {
 		this.onLoadListener = onLoadListener;
