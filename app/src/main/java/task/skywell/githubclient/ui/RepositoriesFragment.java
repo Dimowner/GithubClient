@@ -127,10 +127,15 @@ public class RepositoriesFragment extends Fragment {
 
 		mAdapter = new RepositoriesRecyclerAdapter();
 		mAdapter.setItemClickListener((view1, position) -> {
+
+			ListItem item = mAdapter.getItem(position);
+			DetailsFragment detailsFragment = DetailsFragment.newInstance(
+					item.getName(), item.getDescription(), item.getOwner(), item.getAvatar_url());
+
 			AppCompatActivity activity = (AppCompatActivity) getActivity();
 			activity.getSupportFragmentManager()
 					.beginTransaction()
-					.add(R.id.fragment, new DetailsFragment())
+					.add(R.id.fragment, detailsFragment)
 					.addToBackStack("details")
 					.commit();
 
@@ -165,7 +170,7 @@ public class RepositoriesFragment extends Fragment {
 		GitHubRepository[] items = data.getItems();
 
 		for (GitHubRepository e : items) {
-			ListItem item = new ListItem(e.getName(), e.getOwner().getLogin());
+			ListItem item = new ListItem(e.getName(), e.getOwner().getLogin(), e.getDescription(), e.getOwner().getAvatar_url());
 			listData.add(item);
 		}
 		return listData;

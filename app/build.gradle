@@ -24,7 +24,10 @@ ext.versions = [
 		retroFit			  : "2.3.0",
 
 		//Timber
-		timber			  : "4.5.1"
+		timber			  : "4.5.1",
+
+		//Glide
+		glide				  : "3.8.0"
 ]
 
 android {
@@ -81,6 +84,8 @@ dependencies {
 	//Timber
 	compile "com.jakewharton.timber:timber:$versions.timber"
 
+	//Glide
+	compile "com.github.bumptech.glide:glide:$versions.glide"
 
 	androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
 		exclude group: 'com.android.support', module: 'support-annotations'

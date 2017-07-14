@@ -27,10 +27,14 @@ import android.support.annotation.NonNull;
 class ListItem implements Parcelable {
 	private String name;
 	private String owner;
+	private String description;
+	private String avatar_url;
 
-	ListItem(@NonNull String name, @NonNull String owner) {
+	ListItem(@NonNull String name, @NonNull String owner, String description, String avatar_url) {
 		this.name = name;
 		this.owner = owner;
+		this.description = description;
+		this.avatar_url = avatar_url;
 	}
 
 	String getName() {
@@ -41,12 +45,22 @@ class ListItem implements Parcelable {
 		return owner;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public String getAvatar_url() {
+		return avatar_url;
+	}
+
 	//----- START Parcelable implementation ----------
 	private ListItem(Parcel in) {
-		String[] data = new String[2];
+		String[] data = new String[4];
 		in.readStringArray(data);
 		name = data[0];
 		owner = data[1];
+		description = data[2];
+		avatar_url = data[3];
 	}
 
 	public int describeContents() {
@@ -54,7 +68,7 @@ class ListItem implements Parcelable {
 	}
 
 	public void writeToParcel(Parcel out, int flags) {
-			out.writeStringArray(new String[] {name, owner});
+			out.writeStringArray(new String[] {name, owner, description, avatar_url});
 	}
 
 	public static final Parcelable.Creator<ListItem> CREATOR
@@ -74,6 +88,8 @@ class ListItem implements Parcelable {
 		return "ListItem{" +
 				"name='" + name + '\'' +
 				", owner='" + owner + '\'' +
+				", description='" + description + '\'' +
+				", avatar_url='" + avatar_url + '\'' +
 				'}';
 	}
 }

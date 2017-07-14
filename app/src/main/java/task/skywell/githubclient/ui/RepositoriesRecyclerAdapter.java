@@ -83,6 +83,10 @@ class RepositoriesRecyclerAdapter extends RecyclerView.Adapter<RepositoriesRecyc
 		return mShowingData.size();
 	}
 
+	public ListItem getItem(int pos) {
+		return mShowingData.get(pos);
+	}
+
 	public void setData(List<ListItem> data) {
 		if (data != null) {
 			this.mShowingData = data;

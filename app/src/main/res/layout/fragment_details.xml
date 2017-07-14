@@ -15,19 +15,55 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-				  android:layout_width="match_parent"
-				  android:layout_height="match_parent"
-				  android:background="@color/blue_grey_50"
-				  android:orientation="horizontal">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+															xmlns:app="http://schemas.android.com/apk/res-auto"
+															android:layout_width="match_parent"
+															android:layout_height="match_parent"
+															android:background="@color/blue_grey_50"
+															android:orientation="horizontal">
 
 	<TextView
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:gravity="center"
+			android:id="@+id/details_repo_name"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:padding="@dimen/padding_standard"
+			android:textColor="@color/blue_grey_600"
 			android:textSize="20sp"
 			android:textStyle="bold"
-			android:textColor="@color/blue_grey_600"
-			android:text="TEST"/>
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintRight_toRightOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
 
-</LinearLayout>
+	<TextView
+			android:id="@+id/details_owner"
+			android:layout_width="0dp"
+			android:layout_height="72dp"
+			android:layout_marginTop="-13dp"
+			android:gravity="center_vertical"
+			android:padding="@dimen/padding_standard"
+			android:textSize="16sp"
+			android:textStyle="bold"
+			app:layout_constraintHorizontal_bias="1.0"
+			app:layout_constraintLeft_toRightOf="@+id/details_owner_face"
+			app:layout_constraintRight_toRightOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/details_repo_name"/>
+
+	<ImageView
+			android:id="@+id/details_owner_face"
+			android:layout_width="80dp"
+			android:layout_height="80dp"
+			android:padding="@dimen/padding_standard"
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/details_repo_name"/>
+
+	<TextView
+			android:id="@+id/details_repo_description"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:padding="@dimen/padding_standard"
+			android:textColor="@color/blue_grey_400"
+			android:textSize="16sp"
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintRight_toRightOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/details_owner"/>
+</android.support.constraint.ConstraintLayout>
