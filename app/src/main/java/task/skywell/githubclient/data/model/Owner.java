@@ -21,15 +21,34 @@ package task.skywell.githubclient.data.model;
  * @author Dimowner
  */
 public class Owner {
-	private final String login;
 	private final int id;
+	private final String login;
+	private final String avatar_url;
 
-	public Owner(String login, int id) {
-		this.login = login;
+	public Owner(int id, String login, String avatar_url) {
 		this.id = id;
+		this.login = login;
+		this.avatar_url = avatar_url;
 	}
 
 	public String getLogin() {
 		return login;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getAvatar_url() {
+		return avatar_url;
+	}
+
+	@Override
+	public String toString() {
+		return "Owner{" +
+				"id=" + id +
+				", login='" + login + '\'' +
+				", avatar_url='" + avatar_url + '\'' +
+				'}';
 	}
 }

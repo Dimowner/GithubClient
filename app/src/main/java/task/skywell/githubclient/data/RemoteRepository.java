@@ -18,9 +18,6 @@ package task.skywell.githubclient.data;
 
 import android.support.annotation.NonNull;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import io.reactivex.Single;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -66,6 +63,7 @@ public class RemoteRepository implements IRepository {
 		GitHub github = retrofit.create(GitHub.class);
 
 //		TODO: save into local repository
+//		TODO: do two parallel queries
 		return github.searchRepositories(search, "stars", 0);
 	}
 //

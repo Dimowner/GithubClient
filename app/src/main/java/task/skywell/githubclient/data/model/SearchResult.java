@@ -16,6 +16,8 @@
 
 package task.skywell.githubclient.data.model;
 
+import java.util.Arrays;
+
 /**
  * Created on 14.07.2017.
  * @author Dimowner
@@ -35,5 +37,13 @@ public  class SearchResult {
 
 	public GitHubRepository[] getItems() {
 		return items;
+	}
+
+	@Override
+	public String toString() {
+		return "SearchResult{" +
+				"total_count=" + total_count +
+				", items=" + Arrays.toString(items) +
+				'}';
 	}
 }

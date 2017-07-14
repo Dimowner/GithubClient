@@ -22,23 +22,49 @@ package task.skywell.githubclient.data.model;
  */
 public class GitHubRepository {
 	//		TODO: fix this class
+	private final long id;
 	private final String name;
-	private final String fullName;
-	private final String url;
+	private final String description;
+	private final int stargazers_count;
 	private final Owner owner;
 
-	public GitHubRepository(String name, String full_name, String url, Owner owner) {
+	public GitHubRepository(long id, String name, String description, int stargazers_count, Owner owner) {
+		this.id = id;
 		this.name = name;
-		this.fullName = full_name;
-		this.url = url;
+		this.description = description;
+		this.stargazers_count = stargazers_count;
 		this.owner = owner;
+	}
+
+
+	public long getId() {
+		return id;
 	}
 
 	public String getName() {
 		return name;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public int getStargazers_count() {
+		return stargazers_count;
+	}
+
 	public Owner getOwner() {
 		return owner;
+	}
+
+	@Override
+	public String toString() {
+		return "GitHubRepository{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", description='" + description + '\'' +
+				", stargazers_count=" + stargazers_count +
+				", owner=" + owner +
+				'}';
 	}
 }
