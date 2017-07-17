@@ -26,7 +26,6 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import task.skywell.githubclient.data.room.AppDatabase;
 import task.skywell.githubclient.data.room.RepositoriesDao;
@@ -62,8 +61,7 @@ public class LocalRepository implements IRepository {
 	@Override
 	public Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
 		return getRepositoriesDao().getAll()
-				.subscribeOn(Schedulers.io())
-				.subscribeOn(AndroidSchedulers.mainThread());
+				.subscribeOn(Schedulers.io());
 	}
 
 	/**
@@ -94,8 +92,9 @@ public class LocalRepository implements IRepository {
 	}
 
 	/**
-	 * Check query string already cached
-	 * @param queryStr string to check
+	 * Check that repositories for query already cached
+	 * @param queryStr query string to check
+	 * @return true if repositories for specified query already cached, otherwise - false.
 	 */
 	boolean isCached(String queryStr) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(weakContext.get());

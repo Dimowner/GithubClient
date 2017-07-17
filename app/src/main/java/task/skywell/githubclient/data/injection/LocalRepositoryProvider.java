@@ -23,14 +23,14 @@ import task.skywell.githubclient.data.LocalRepository;
  * Created on 14.07.2017.
  * @author Dimowner
  */
-public class LocalRepositoryProvider {
+class LocalRepositoryProvider {
 
 	//Prevent instantiation
 	private LocalRepositoryProvider() {}
 
 	private static volatile LocalRepository localRepository;
 
-	public static LocalRepository getInstance(Context context) {
+	static LocalRepository getInstance(Context context) {
 		synchronized (LocalRepositoryProvider.class) {
 			if (localRepository == null) {
 				localRepository = new LocalRepository(context);

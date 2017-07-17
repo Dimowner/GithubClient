@@ -22,14 +22,14 @@ import task.skywell.githubclient.data.RemoteRepository;
  * Created on 14.07.2017.
  * @author Dimowner
  */
-public class RemoteRepositoryProvider {
+class RemoteRepositoryProvider {
 
 	//Prevent instantiation
 	private RemoteRepositoryProvider() {}
 
 	private static volatile RemoteRepository remoteRepository;
 
-	public static RemoteRepository getInstance() {
+	static RemoteRepository getInstance() {
 		synchronized (RemoteRepository.class) {
 			if (remoteRepository == null) {
 				remoteRepository = new RemoteRepository();

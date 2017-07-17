@@ -71,13 +71,13 @@ public class RemoteRepository implements IRepository {
 		GitHub github = retrofit.create(GitHub.class);
 
 		return Flowable.zip(
-				github.searchRepositories(search, "stars", 0)
-						.map(this::convertModel)
-						.subscribeOn(Schedulers.io()),
 				github.searchRepositories(search, "stars", 1)
 						.map(this::convertModel)
 						.subscribeOn(Schedulers.io()),
-				this::convert)
+				github.searchRepositories(search, "stars", 2)
+						.map(this::convertModel)
+						.subscribeOn(Schedulers.io()),
+				this::mergeResults)
 				.doOnNext(data -> {
 							if (onLoadListener != null) {
 								onLoadListener.onRepositoriesLoad(search, data);
@@ -86,9 +86,9 @@ public class RemoteRepository implements IRepository {
 	}
 
 	/**
-	 * Convert {@link task.skywell.githubclient.data.model.GitHubRepository} models int {@link RepositoryItemModel} models
-	 * @param data {@link task.skywell.githubclient.data.model.GitHubRepository} list
-	 * @return {@link RepositoryItemModel} list
+	 * Convert {@link task.skywell.githubclient.data.model.SearchResult} models into list of {@link RepositoryItemModel} models
+	 * @param data {@link task.skywell.githubclient.data.model.SearchResult}
+	 * @return Coverted {@link RepositoryItemModel} list
 	 */
 	private List<RepositoryItemModel> convertModel(SearchResult data) {
 		List<RepositoryItemModel> listData = new ArrayList<>();
@@ -103,15 +103,16 @@ public class RemoteRepository implements IRepository {
 		return listData;
 	}
 
-	private List<RepositoryItemModel> convert(List<RepositoryItemModel> r1, List<RepositoryItemModel> r2) {
+	/**
+	 * Merge two lists into one
+	 * @param r1 List of {@link RepositoryItemModel} items from first query
+	 * @param r2 List of {@link RepositoryItemModel} items from second query
+	 * @return Combined result
+	 */
+	private List<RepositoryItemModel> mergeResults(List<RepositoryItemModel> r1, List<RepositoryItemModel> r2) {
 		List<RepositoryItemModel> list = new ArrayList<>(r1.size() + r2.size());
 		list.addAll(r1);
 		list.addAll(r2);
-
-		//Update all items id to avoid SQLiteConstraintException on insert into SQLite
-		for (int i = 0; i < list.size(); i++) {
-			list.get(i).setId(i);
-		}
 
 		return list;
 	}
@@ -120,6 +121,9 @@ public class RemoteRepository implements IRepository {
 		this.onLoadListener = onLoadListener;
 	}
 
+	/**
+	 * Interface for transfer query results into {@link LocalRepository} for caching.
+	 */
 	public interface OnLoadListener {
 		void onRepositoriesLoad(String query, List<RepositoryItemModel> list);
 	}

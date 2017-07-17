@@ -149,16 +149,16 @@ public class RepositoriesFragment extends Fragment {
 			compositeDisposable.add(
 					RepositoryProvider.getInstance(getContext())
 							.searchRepositories(str)
-							.observeOn(AndroidSchedulers.mainThread())
 							.map(this::convertModel)
+							.observeOn(AndroidSchedulers.mainThread())
 							.subscribe(this::displayData, this::handleError));
 		}
 	}
 
 	/**
-	 * Convert {@link task.skywell.githubclient.data.model.GitHubRepository} models int {@link ListItem} models
-	 * @param data {@link task.skywell.githubclient.data.model.GitHubRepository} list
-	 * @return {@link ListItem} list
+	 * Convert {@link task.skywell.githubclient.data.room.RepositoryItemModel} models int {@link ListItem} models
+	 * @param data List of {@link task.skywell.githubclient.data.room.RepositoryItemModel} items.
+	 * @return List of {@link ListItem} items.
 	 */
 	private List<ListItem> convertModel(List<RepositoryItemModel> data) {
 		List<ListItem> listData = new ArrayList<>(data.size());
@@ -207,7 +207,7 @@ public class RepositoriesFragment extends Fragment {
 	/**
 	 * Check connectivity to network
 	 * @param context app context
-	 * @return true if connected otherwise false
+	 * @return true if connected, otherwise - false
 	 */
 	public boolean isConnectedToNetwork(Context context) {
 		NetworkInfo networkInfo = ((ConnectivityManager) context

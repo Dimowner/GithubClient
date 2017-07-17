@@ -24,11 +24,17 @@ import io.reactivex.Flowable;
 import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 /**
+ * Contract for application repositories
  * Created on 14.07.2017.
  * @author Dimowner
  */
 interface IRepository {
 
+	/**
+	 * Do search repositories by specified query string.
+	 * @param search Query string for search
+	 * @return Search result contained in List of {@link RepositoryItemModel} items
+	 */
 	Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search);
 
 }

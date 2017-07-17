@@ -23,13 +23,11 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import task.skywell.githubclient.R;
@@ -89,6 +87,10 @@ public class SearchViewPanel extends LinearLayout {
 		}
 	}
 
+	/**
+	 * Method starts showing progress, and calls on {@link OnSearchListener}
+	 * method {@link OnSearchListener#onStartSearch(String)}
+	 */
 	public void startSearch() {
 		String searchStr = txtContent.getText().toString();
 		if (!searchStr.isEmpty()) {
@@ -102,6 +104,10 @@ public class SearchViewPanel extends LinearLayout {
 		}
 	}
 
+	/**
+	 * Method cancels showing progress, and calls on {@link OnSearchListener}
+	 * method {@link OnSearchListener#onCancelSearch()}
+	 */
 	public void cancelSearch() {
 		inProgress = false;
 		hideSearchProgress();
@@ -112,7 +118,7 @@ public class SearchViewPanel extends LinearLayout {
 
 	/**
 	 * Method finishes showing progress, and calls on {@link OnSearchListener}
-	 * method {@link OnSearchListener#finishSearch()}
+	 * method {@link OnSearchListener#onFinishSearch()}
 	 */
 	public void finishSearch() {
 		inProgress = false;
