@@ -29,9 +29,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import task.skywell.githubclient.R;
-import timber.log.Timber;
 
 /**
  * Created on 13.07.2017.
@@ -153,7 +151,6 @@ public class SearchViewPanel extends LinearLayout {
 
 	@Override
 	public Parcelable onSaveInstanceState() {
-		Timber.v("onSaveState");
 		Parcelable superState = super.onSaveInstanceState();
 		SavedState ss = new SavedState(superState);
 		ss.inProgress = inProgress;

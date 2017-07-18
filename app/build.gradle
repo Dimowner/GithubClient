@@ -30,7 +30,9 @@ ext.versions = [
 		glide				  : "3.8.0",
 
 		//Architecture components
-		archComp			  : "1.0.0-alpha3"
+		archComp			  : "1.0.0-alpha3",
+
+		logInterceptor	  : "3.8.1"
 ]
 
 android {
@@ -82,7 +84,7 @@ dependencies {
 	compile "com.squareup.retrofit2:retrofit:$versions.retroFit"
 	compile "com.squareup.retrofit2:converter-gson:$versions.retroFit"
 	compile "com.squareup.retrofit2:adapter-rxjava2:$versions.retroFit"
-	compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
+	compile "com.squareup.okhttp3:logging-interceptor:$versions.logInterceptor"
 
 	//Timber
 	compile "com.jakewharton.timber:timber:$versions.timber"
@@ -99,4 +101,7 @@ dependencies {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
 	testCompile 'junit:junit:4.12'
+	testCompile 'org.mockito:mockito-core:2.8.47'
+	// AssertJ
+	testCompile "org.assertj:assertj-core:3.0.0"
 }
