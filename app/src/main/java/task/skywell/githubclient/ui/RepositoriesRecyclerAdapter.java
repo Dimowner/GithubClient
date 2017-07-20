@@ -16,13 +16,15 @@
 
 package task.skywell.githubclient.ui;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.view.AbsSavedState;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 import task.skywell.githubclient.R;
-import timber.log.Timber;
+import task.skywell.githubclient.AndroidUtils;
 
 /**
  * Created on 14.07.2017.
@@ -43,15 +45,11 @@ class RepositoriesRecyclerAdapter extends RecyclerView.Adapter<RepositoriesRecyc
 	private ItemClickListener itemClickListener;
 
 	class ItemViewHolder extends RecyclerView.ViewHolder {
-		TextView name;
-		TextView owner;
 		View view;
 
 		ItemViewHolder(View itemView) {
 			super(itemView);
 			this.view = itemView;
-			this.name = (TextView) itemView.findViewById(R.id.list_item_name);
-			this.owner = (TextView) itemView.findViewById(R.id.list_item_owner);
 		}
 	}
 
@@ -61,21 +59,40 @@ class RepositoriesRecyclerAdapter extends RecyclerView.Adapter<RepositoriesRecyc
 
 	@Override
 	public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		View v = LayoutInflater.from(parent.getContext())
-				.inflate(R.layout.list_item, parent, false);
-		return new ItemViewHolder(v);
+
+		//Create list item programmatically. It is just TextView
+		Context ctx = parent.getContext();
+		TextView view = new TextView(ctx);
+		int standardPad = (int) ctx.getResources().getDimension(R.dimen.padding_standard);
+		int tinyPad = (int) ctx.getResources().getDimension(R.dimen.padding_tiny);
+		view.setPadding(standardPad, tinyPad, standardPad, tinyPad);
+		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+		view.setLayoutParams(params);
+		view.setLineSpacing(tinyPad, view.getLineSpacingMultiplier());
+		return new ItemViewHolder(view);
 	}
 
 	@Override
 	public void onBindViewHolder(final ItemViewHolder holder, final int position) {
-		holder.name.setText(mShowingData.get(position).getName());
-		holder.owner.setText(mShowingData.get(position).getOwner());
 		holder.view.setOnClickListener(v -> {
 			if (itemClickListener != null) {
 				itemClickListener.onItemClick(v, holder.getAdapterPosition());
 			}
 		});
 
+//		TODO: should be added check that one line fit on screen without move to next line.
+		//Build styled 2 lines string
+		SpannableStringBuilder builder = new SpannableStringBuilder()
+				.append(AndroidUtils.formatString(holder.view.getContext(),
+						mShowingData.get(position).getName(),
+						R.style.ListItemMainTextAppearance))
+				.append("\n")
+				.append(AndroidUtils.formatString(holder.view.getContext(),
+						mShowingData.get(position).getName(),
+						R.style.ListItemSecondaryTextAppearance));
+
+		((TextView)holder.view).setText(builder.subSequence(0, builder.length()));
 	}
 
 	@Override
@@ -83,7 +100,7 @@ class RepositoriesRecyclerAdapter extends RecyclerView.Adapter<RepositoriesRecyc
 		return mShowingData.size();
 	}
 
-	public ListItem getItem(int pos) {
+	ListItem getItem(int pos) {
 		return mShowingData.get(pos);
 	}
 
