@@ -21,15 +21,17 @@ import android.content.Context;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.subscribers.TestSubscriber;
 import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -38,75 +40,86 @@ import static org.mockito.Mockito.when;
  */
 public class RepositoryTest {
 
-	private LocalRepository localRepository;
-	private RemoteRepository remoteRepository;
-	private Repository repository;
+	private static final String QUERY = "query";
 
 	@Mock
 	Context mockContext;
 
+	@Mock
+	private LocalRepository localRepository;
+
+	@Mock
+	private RemoteRepository remoteRepository;
+
+	private Repository repository;
+
+
 	@Before
 	public void beforeEachTest() {
-		localRepository = mock(LocalRepository.class);
-		remoteRepository = mock(RemoteRepository.class);
+		MockitoAnnotations.initMocks(this);
 		repository = new Repository(localRepository, remoteRepository);
 	}
 
 	@Test
 	public void searchRepositories_fromRemoteRepo() {
-		when(localRepository.isCached("query")).thenReturn(false);
+		when(localRepository.isCached(QUERY)).thenReturn(false);
 		List<RepositoryItemModel> testList = new ArrayList<>(1);
-		testList.add(new RepositoryItemModel(5, "Repo", "master", "description", "http://test.com"));
-		when(remoteRepository.searchRepositories("query")).thenReturn(Single.fromCallable(() -> testList));
+		testList.add(new RepositoryItemModel(1, "name", "owner", "description", "http://test.com"));
+		when(remoteRepository.searchRepositories(QUERY)).thenReturn(Single.fromCallable(() -> testList));
 
-		final RepositoryItemModel[] item = new RepositoryItemModel[1];
+		TestObserver<List<RepositoryItemModel>> observer = new TestObserver<>();
+		repository.searchRepositories(QUERY).subscribe(observer);
 
-		repository.searchRepositories("query").subscribe(data -> item[0] = data.get(0));
-		assertThat(item[0].getId()).isEqualTo(5);
-		assertThat(item[0].getName()).isEqualTo("Repo");
-		assertThat(item[0].getOwner()).isEqualTo("master");
-		assertThat(item[0].getDescription()).isEqualTo("description");
-		assertThat(item[0].getAvatar_url()).isEqualTo("http://test.com");
-	}
-
-	@Test
-	public void searchRepositories_fromLocalRepo() {
-		when(localRepository.isCached("query")).thenReturn(true);
-		List<RepositoryItemModel> testList = new ArrayList<>(1);
-		testList.add(new RepositoryItemModel(5, "Repo", "master", "description", "http://test.com"));
-		when(localRepository.searchRepositories("query")).thenReturn(Single.fromCallable(() -> testList));
-
-		final RepositoryItemModel[] item = new RepositoryItemModel[1];
-
-		repository.searchRepositories("query").subscribe(data -> item[0] = data.get(0));
-
-		assertThat(item[0].getId()).isEqualTo(5);
-		assertThat(item[0].getName()).isEqualTo("Repo");
-		assertThat(item[0].getOwner()).isEqualTo("master");
-		assertThat(item[0].getDescription()).isEqualTo("description");
-		assertThat(item[0].getAvatar_url()).isEqualTo("http://test.com");
+		observer.assertComplete();
+		observer.assertNoErrors();
+		observer.assertValueCount(1);
+		observer.assertValues(testList);
 	}
 
 	@Test
 	public void searchRepositories_fromRemoteRepo_error() {
-		when(localRepository.isCached("query")).thenReturn(false);
-		when(remoteRepository.searchRepositories("query")).thenReturn(Single.error(new NullPointerException("Error")));
+		Exception exception = new RuntimeException("exception");
 
-		final String[] errorMessage = {""};
-		repository.searchRepositories("query").subscribe(data -> {},
-				throwable -> errorMessage[0] = throwable.getMessage());
-		assertThat(errorMessage[0]).isEqualTo("Error");
+		when(localRepository.isCached(QUERY)).thenReturn(false);
+		when(remoteRepository.searchRepositories(QUERY)).thenReturn(Single.error(exception));
 
+		TestObserver<List<RepositoryItemModel>> observer = new TestObserver<>();
+		repository.searchRepositories(QUERY).subscribe(observer);
+
+		observer.assertError(exception);
+		observer.assertNotComplete();
+		observer.assertErrorMessage("exception");
 	}
 
 	@Test
-	public void searchRepositories_fromRemoteRepo_emptyList() {
-		when(localRepository.isCached("query")).thenReturn(false);
-		List<RepositoryItemModel> testList = new ArrayList<>();
-		when(remoteRepository.searchRepositories("query")).thenReturn(Single.fromCallable(() -> testList));
+	public void searchRepositories_fromLocalRepo() {
 
-		final int[] size = {0};
-		repository.searchRepositories("query").subscribe(data -> size[0] = data.size());
-		assertThat(size[0]).isEqualTo(0);
+		when(localRepository.isCached(QUERY)).thenReturn(true);
+		List<RepositoryItemModel> testList = new ArrayList<>(1);
+		testList.add(new RepositoryItemModel(1, "name", "owner", "description", "http://test.com"));
+		when(localRepository.searchRepositories(QUERY)).thenReturn(Single.fromCallable(() -> testList));
+
+		TestObserver<List<RepositoryItemModel>> observer = new TestObserver<>();
+		repository.searchRepositories(QUERY).subscribe(observer);
+
+		observer.assertComplete();
+		observer.assertNoErrors();
+		observer.assertValueCount(1);
+		observer.assertValues(testList);
+	}
+
+	@Test
+	public void searchRepositories_fromLocalRepo_error() {
+		Exception exception = new RuntimeException("exception");
+
+		when(localRepository.isCached(QUERY)).thenReturn(true);
+		when(localRepository.searchRepositories(QUERY)).thenReturn(Single.error(exception));
+
+		TestObserver<List<RepositoryItemModel>> observer = new TestObserver<>();
+		repository.searchRepositories(QUERY).subscribe(observer);
+
+		observer.assertError(exception);
+		observer.assertNotComplete();
+		observer.assertErrorMessage("exception");
 	}
 }
