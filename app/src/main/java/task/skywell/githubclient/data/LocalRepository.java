@@ -24,7 +24,6 @@ import android.support.annotation.NonNull;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import task.skywell.githubclient.data.room.AppDatabase;
@@ -59,7 +58,7 @@ public class LocalRepository implements IRepository {
 	}
 
 	@Override
-	public Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
+	public Single<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
 		return getRepositoriesDao().getAll()
 				.subscribeOn(Schedulers.io());
 	}

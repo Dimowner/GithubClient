@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -42,35 +42,42 @@ public class RemoteRepository implements IRepository {
 
 	private static final String API_URL = "https://api.github.com";
 
+	private Retrofit retrofit;
+	private GitHub github;
+
 	private OnLoadListener onLoadListener;
 
 	interface GitHub {
 		@GET("/search/repositories")
-		Flowable<SearchResult> searchRepositories(
+		Single<SearchResult> searchRepositories(
 				@Query("q") String search,
 				@Query("sort") String order,
 				@Query("page") Integer page);
 	}
 
 	@Override
-	public Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
+	public Single<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
 
-		HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-		interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-		OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+		if (retrofit == null) {
+			HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+			interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+			OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-		// Create a very simple REST adapter which points the GitHub API.
-		Retrofit retrofit = new Retrofit.Builder()
-				.baseUrl(API_URL)
-				.client(client)
-				.addConverterFactory(GsonConverterFactory.create())
-				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-				.build();
+			// Create a very simple REST adapter which points the GitHub API.
+			retrofit = new Retrofit.Builder()
+					.baseUrl(API_URL)
+					.client(client)
+					.addConverterFactory(GsonConverterFactory.create())
+					.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+					.build();
+		}
 
-		// Create an instance of our GitHub API interface.
-		GitHub github = retrofit.create(GitHub.class);
+		if (github == null) {
+			// Create an instance of our GitHub API interface.
+			github = retrofit.create(GitHub.class);
+		}
 
-		return Flowable.zip(
+		return Single.zip(
 				github.searchRepositories(search, "stars", 1)
 						.map(this::convertModel)
 						.subscribeOn(Schedulers.io()),
@@ -78,7 +85,7 @@ public class RemoteRepository implements IRepository {
 						.map(this::convertModel)
 						.subscribeOn(Schedulers.io()),
 				this::mergeResults)
-				.doOnNext(data -> {
+				.doOnSuccess(data -> {
 							if (onLoadListener != null) {
 								onLoadListener.onRepositoriesLoad(search, data);
 							}

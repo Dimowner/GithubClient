@@ -20,7 +20,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import java.util.List;
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 /**
  * Created on 14.07.2017.
@@ -29,7 +29,7 @@ import io.reactivex.Flowable;
 @Dao
 public interface RepositoriesDao {
 	@Query("SELECT * FROM RepositoryItemModel")
-	Flowable<List<RepositoryItemModel>> getAll();
+	Single<List<RepositoryItemModel>> getAll();
 
 	@Insert
 	void insertAll(RepositoryItemModel... items);

@@ -30,7 +30,7 @@ ext.versions = [
 		glide				  : "3.8.0",
 
 		//Architecture components
-		archComp			  : "1.0.0-alpha3",
+		archComp			  : "1.0.0-alpha5",
 
 		logInterceptor	  : "3.8.1"
 ]

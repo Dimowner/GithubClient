@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 /**
@@ -35,6 +35,6 @@ interface IRepository {
 	 * @param search Query string for search
 	 * @return Search result contained in List of {@link RepositoryItemModel} items
 	 */
-	Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search);
+	Single<List<RepositoryItemModel>> searchRepositories(@NonNull String search);
 
 }

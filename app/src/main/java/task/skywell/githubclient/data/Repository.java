@@ -18,7 +18,7 @@ package task.skywell.githubclient.data;
 
 import android.support.annotation.NonNull;
 import java.util.List;
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 /**
@@ -36,7 +36,7 @@ public class Repository implements IRepository {
 	}
 
 	@Override
-	public Flowable<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
+	public Single<List<RepositoryItemModel>> searchRepositories(@NonNull String search) {
 		if (localRepository.isCached(search)) {
 			return localRepository.searchRepositories(search);
 		} else {

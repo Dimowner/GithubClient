@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 import task.skywell.githubclient.data.room.RepositoryItemModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,7 +57,7 @@ public class RepositoryTest {
 		when(localRepository.isCached("query")).thenReturn(false);
 		List<RepositoryItemModel> testList = new ArrayList<>(1);
 		testList.add(new RepositoryItemModel(5, "Repo", "master", "description", "http://test.com"));
-		when(remoteRepository.searchRepositories("query")).thenReturn(Flowable.fromCallable(() -> testList));
+		when(remoteRepository.searchRepositories("query")).thenReturn(Single.fromCallable(() -> testList));
 
 		final RepositoryItemModel[] item = new RepositoryItemModel[1];
 
@@ -74,7 +74,7 @@ public class RepositoryTest {
 		when(localRepository.isCached("query")).thenReturn(true);
 		List<RepositoryItemModel> testList = new ArrayList<>(1);
 		testList.add(new RepositoryItemModel(5, "Repo", "master", "description", "http://test.com"));
-		when(localRepository.searchRepositories("query")).thenReturn(Flowable.fromCallable(() -> testList));
+		when(localRepository.searchRepositories("query")).thenReturn(Single.fromCallable(() -> testList));
 
 		final RepositoryItemModel[] item = new RepositoryItemModel[1];
 
@@ -90,7 +90,7 @@ public class RepositoryTest {
 	@Test
 	public void searchRepositories_fromRemoteRepo_error() {
 		when(localRepository.isCached("query")).thenReturn(false);
-		when(remoteRepository.searchRepositories("query")).thenReturn(Flowable.error(new NullPointerException("Error")));
+		when(remoteRepository.searchRepositories("query")).thenReturn(Single.error(new NullPointerException("Error")));
 
 		final String[] errorMessage = {""};
 		repository.searchRepositories("query").subscribe(data -> {},
@@ -103,7 +103,7 @@ public class RepositoryTest {
 	public void searchRepositories_fromRemoteRepo_emptyList() {
 		when(localRepository.isCached("query")).thenReturn(false);
 		List<RepositoryItemModel> testList = new ArrayList<>();
-		when(remoteRepository.searchRepositories("query")).thenReturn(Flowable.fromCallable(() -> testList));
+		when(remoteRepository.searchRepositories("query")).thenReturn(Single.fromCallable(() -> testList));
 
 		final int[] size = {0};
 		repository.searchRepositories("query").subscribe(data -> size[0] = data.size());
