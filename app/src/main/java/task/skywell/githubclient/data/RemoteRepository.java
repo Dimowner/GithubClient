@@ -17,6 +17,7 @@
 package task.skywell.githubclient.data;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,9 @@ public class RemoteRepository implements IRepository {
 	private static final String API_URL = "https://api.github.com";
 
 	private Retrofit retrofit;
-	private GitHub github;
+
+	@VisibleForTesting
+	GitHub github;
 
 	private OnLoadListener onLoadListener;
 
@@ -97,7 +100,8 @@ public class RemoteRepository implements IRepository {
 	 * @param data {@link task.skywell.githubclient.data.model.SearchResult}
 	 * @return Coverted {@link RepositoryItemModel} list
 	 */
-	private List<RepositoryItemModel> convertModel(SearchResult data) {
+	@VisibleForTesting
+	List<RepositoryItemModel> convertModel(SearchResult data) {
 		List<RepositoryItemModel> listData = new ArrayList<>();
 
 		GitHubRepository[] items = data.getItems();
@@ -116,7 +120,8 @@ public class RemoteRepository implements IRepository {
 	 * @param r2 List of {@link RepositoryItemModel} items from second query
 	 * @return Combined result
 	 */
-	private List<RepositoryItemModel> mergeResults(List<RepositoryItemModel> r1, List<RepositoryItemModel> r2) {
+	@VisibleForTesting
+	List<RepositoryItemModel> mergeResults(List<RepositoryItemModel> r1, List<RepositoryItemModel> r2) {
 		List<RepositoryItemModel> list = new ArrayList<>(r1.size() + r2.size());
 		list.addAll(r1);
 		list.addAll(r2);
