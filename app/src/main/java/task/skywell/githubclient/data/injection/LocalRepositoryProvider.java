@@ -28,16 +28,14 @@ class LocalRepositoryProvider {
 	//Prevent instantiation
 	private LocalRepositoryProvider() {}
 
-	private static volatile LocalRepository localRepository;
+	private static LocalRepository localRepository;
 
 	static LocalRepository getInstance(Context context) {
-		synchronized (LocalRepositoryProvider.class) {
-			if (localRepository == null) {
-				localRepository = new LocalRepository(context);
-			} else if (!localRepository.isContextLive()) {
-				localRepository.setContext(context);
-			}
-			return localRepository;
+		if (localRepository == null) {
+			localRepository = new LocalRepository(context);
+		} else if (!localRepository.isContextLive()) {
+			localRepository.setContext(context);
 		}
+		return localRepository;
 	}
 }

@@ -33,17 +33,19 @@ public class RepositoryProvider {
 	private static volatile Repository repository;
 
 	public static Repository getInstance(Context context) {
-		synchronized (RepositoryProvider.class) {
-			if (repository == null) {
-				LocalRepository local = LocalRepositoryProvider.getInstance(context);
-				RemoteRepository remote = RemoteRepositoryProvider.getInstance();
-				remote.setOnLoadListener((query, data) -> {
-					local.rewriteRepositories(data);
-					local.saveQueryString(query);
-				});
-				repository = new Repository(local, remote);
+		if (repository == null) {
+			synchronized (RepositoryProvider.class) {
+				if (repository == null) {
+					LocalRepository local = LocalRepositoryProvider.getInstance(context);
+					RemoteRepository remote = RemoteRepositoryProvider.getInstance();
+					remote.setOnLoadListener((query, data) -> {
+						local.rewriteRepositories(data);
+						local.saveQueryString(query);
+					});
+					repository = new Repository(local, remote);
+				}
 			}
-			return repository;
 		}
+		return repository;
 	}
 }

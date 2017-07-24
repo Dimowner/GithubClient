@@ -17,9 +17,13 @@
 package task.skywell.githubclient;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Point;
+import android.os.Build;
 import android.text.SpannableString;
 import android.text.style.TextAppearanceSpan;
-import android.util.TypedValue;
+import android.view.Display;
+import android.view.WindowManager;
 
 /**
  * Created on 20.07.2017.
@@ -27,10 +31,13 @@ import android.util.TypedValue;
  */
 public class AndroidUtils {
 
+	private static int screenWidth = 0;
+	private static int screenHeight = 0;
+
 	private AndroidUtils() {}
 
-	public static int dp(Context ctx, int val) {
-		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, val, ctx.getResources().getDisplayMetrics());
+	public static int dpToPx(int dp) {
+		return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
 	}
 
 	public static SpannableString formatString(Context context, String text, int styleId) {
@@ -44,5 +51,33 @@ public class AndroidUtils {
 		SpannableString spannableString = new SpannableString(text);
 		spannableString.setSpan(new TextAppearanceSpan(context, styleId), 0, text.length(), 0);
 		return spannableString;
+	}
+
+	public static int getScreenHeight(Context c) {
+		if (screenHeight == 0) {
+			WindowManager wm = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
+			Display display = wm.getDefaultDisplay();
+			Point size = new Point();
+			display.getSize(size);
+			screenHeight = size.y;
+		}
+
+		return screenHeight;
+	}
+
+	public static int getScreenWidth(Context c) {
+		if (screenWidth == 0) {
+			WindowManager wm = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
+			Display display = wm.getDefaultDisplay();
+			Point size = new Point();
+			display.getSize(size);
+			screenWidth = size.x;
+		}
+
+		return screenWidth;
+	}
+
+	public static boolean isAndroid5() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 	}
 }

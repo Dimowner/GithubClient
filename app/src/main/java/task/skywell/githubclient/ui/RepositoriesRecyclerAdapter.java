@@ -67,7 +67,7 @@ class RepositoriesRecyclerAdapter extends RecyclerView.Adapter<RepositoriesRecyc
 		int tinyPad = (int) ctx.getResources().getDimension(R.dimen.padding_tiny);
 		view.setPadding(standardPad, tinyPad, standardPad, tinyPad);
 		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
 		view.setLayoutParams(params);
 		view.setLineSpacing(tinyPad, view.getLineSpacingMultiplier());
 		return new ItemViewHolder(view);

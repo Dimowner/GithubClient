@@ -27,14 +27,12 @@ class RemoteRepositoryProvider {
 	//Prevent instantiation
 	private RemoteRepositoryProvider() {}
 
-	private static volatile RemoteRepository remoteRepository;
+	private static RemoteRepository remoteRepository;
 
 	static RemoteRepository getInstance() {
-		synchronized (RemoteRepository.class) {
-			if (remoteRepository == null) {
-				remoteRepository = new RemoteRepository();
-			}
-			return remoteRepository;
+		if (remoteRepository == null) {
+			remoteRepository = new RemoteRepository();
 		}
+		return remoteRepository;
 	}
 }
